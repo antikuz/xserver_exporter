@@ -18,10 +18,10 @@ type Today struct {
 }
 
 type ChannelUsage struct {
-	Rp float32 `json:"rp"`
-	Tp float32 `json:"tp"`
-	Rx float32 `json:"rx"`
-	Tx float32 `json:"tx"`
+	Rp float64 `json:"rp"`
+	Tp float64 `json:"tp"`
+	Rx float64 `json:"rx"`
+	Tx float64 `json:"tx"`
 }
 
 var (
@@ -72,18 +72,18 @@ func (i IfacesWidget) Collect(ch chan<- prometheus.Metric) {
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatChannelUsageRpDesc, prometheus.GaugeValue, float64(i.Rp),
+		netstatChannelUsageRpDesc, prometheus.GaugeValue, i.Rp,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatChannelUsageTpDesc, prometheus.GaugeValue, float64(i.Tp),
+		netstatChannelUsageTpDesc, prometheus.GaugeValue, i.Tp,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatChannelUsageRxDesc, prometheus.GaugeValue, float64(i.Rx),
+		netstatChannelUsageRxDesc, prometheus.GaugeValue, i.Rx,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatChannelUsageTxDesc, prometheus.GaugeValue, float64(i.Tx),
+		netstatChannelUsageTxDesc, prometheus.GaugeValue, i.Tx,
 	)
 }
