@@ -14,28 +14,28 @@ var (
 	usersActiveDesc = prometheus.NewDesc(
 		"xserver_users_active",
 		"Number of users online.",
-		[]string{}, nil,
+		nil, nil,
 	)
 	usersBlockedDesc = prometheus.NewDesc(
 		"xserver_users_blocked",
 		"Number of users blocked.",
-		[]string{}, nil,
+		nil, nil,
 	)
 	usersEnabledDesc = prometheus.NewDesc(
 		"xserver_users_enabled",
 		"Number of users enabled.",
-		[]string{}, nil,
+		nil, nil,
 	)
 	usersTotalDesc = prometheus.NewDesc(
 		"xserver_users_total",
 		"Number of users total.",
-		[]string{}, nil,
+		nil, nil,
 	)
 
 	usersVpnDesc = prometheus.NewDesc(
-		"xserver_users_total",
+		"xserver_users_vpn",
 		"Number of users connected by vpn.",
-		[]string{}, nil,
+		nil, nil,
 	)
 )
 
