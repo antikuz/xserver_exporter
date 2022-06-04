@@ -2,7 +2,7 @@ package collector
 
 import "github.com/prometheus/client_golang/prometheus"
 
-type UsersWidget struct {
+type usersWidget struct {
 	Active  int `json:"active"`
 	Blocked int `json:"blocked"`
 	Enabled int `json:"enabled"`
@@ -11,6 +11,8 @@ type UsersWidget struct {
 }
 
 var (
+	UsersWidget usersWidget
+	
 	usersActiveDesc = prometheus.NewDesc(
 		"xserver_users_active",
 		"Number of users online.",
@@ -39,7 +41,7 @@ var (
 	)
 )
 
-func (u UsersWidget) Collect(ch chan<- prometheus.Metric) {
+func (u usersWidget) Collect(ch chan<- prometheus.Metric) {
 	ch <- prometheus.MustNewConstMetric(
 		usersActiveDesc, prometheus.GaugeValue, float64(u.Active),
 	)
