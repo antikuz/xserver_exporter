@@ -36,7 +36,8 @@ func (xserver xserver) getJson() ([]byte, error) {
 		},
 	}
 
-	request, err := http.NewRequest("GET", xserver.url, nil)
+	url := xserver.url + "/scalaboom/widgets?sitesFeedCount=0&searchFeedCount=0&systemJournalCount=0"
+	request, err := http.NewRequest("GET", url, nil)
     if err != nil {
         log.Fatal(err)
     }
