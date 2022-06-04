@@ -5,30 +5,29 @@ import (
 	"net/http"
 
 	"github.com/antikuz/xserver_exporter/collector"
+	"github.com/antikuz/xserver_exporter/internal/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
-	url := "http://localhost:8000"
-	login := "login"
-	passwd := "passwd"
-	insecureSkip := true
+	cfg := config.GetConfig()
 
-	reg := prometheus.NewPedanticRegistry()
+	registry := prometheus.NewPedanticRegistry()
 	collector.NewXserverManager(
-		url,
-		login,
-		passwd,
-		insecureSkip,
-		reg)
+		cfg.Url,
+		cfg.Login,
+		cfg.Passwd,
+		cfg.InsecureSkip,
+		registry,
+	)
 
-	reg.MustRegister(
+	registry.MustRegister(
 		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
 		collectors.NewGoCollector(),
 	)
 
-	http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
+	http.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
