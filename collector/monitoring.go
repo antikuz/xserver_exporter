@@ -1,8 +1,22 @@
 package collector
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"encoding/json"
+	"log"
 
-type monitoringWidget struct {
+	"github.com/prometheus/client_golang/prometheus"
+)
+
+const (
+	urnMonitoring = "/scalaboom/widgets/MonitoringWidget"
+)
+
+
+type monitoringCollector struct {
+	xserver
+}
+
+type monitoringStatistics struct {
 	Cpu   float64 `json:"cpu"`
 	Ram   float64 `json:"ram"`
 	Swap  float64 `json:"swap"`
@@ -11,8 +25,6 @@ type monitoringWidget struct {
 }
 
 var (
-	MonitoringWidget monitoringWidget
-	
 	monitoringCpuDesc = prometheus.NewDesc(
 		"xserver_monitoring_cpu",
 		"CPU Percentage",
@@ -40,24 +52,36 @@ var (
 	)
 )
 
-func (m monitoringWidget) Collect(ch chan<- prometheus.Metric) {
+func (m monitoringCollector) Describe(ch chan<- *prometheus.Desc) {
+	prometheus.DescribeByCollect(m, ch)
+}
+
+func (m monitoringCollector) Collect(ch chan<- prometheus.Metric) {
+	ms := monitoringStatistics{}
+
+    request, err := m.xserver.getJson(urnMonitoring)
+	if err != nil {
+		log.Fatal(err)
+	}
+    json.Unmarshal(request, &ms)
+
 	ch <- prometheus.MustNewConstMetric(
-		monitoringCpuDesc, prometheus.GaugeValue, m.Cpu,
+		monitoringCpuDesc, prometheus.GaugeValue, ms.Cpu,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		monitoringRamDesc, prometheus.GaugeValue, m.Ram,
+		monitoringRamDesc, prometheus.GaugeValue, ms.Ram,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		monitoringSwapDesc, prometheus.GaugeValue, m.Swap,
+		monitoringSwapDesc, prometheus.GaugeValue, ms.Swap,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		monitoringMaxLaDesc, prometheus.GaugeValue, m.MaxLa,
+		monitoringMaxLaDesc, prometheus.GaugeValue, ms.MaxLa,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		monitoringLaDesc, prometheus.GaugeValue, m.La,
+		monitoringLaDesc, prometheus.GaugeValue, ms.La,
 	)
 }

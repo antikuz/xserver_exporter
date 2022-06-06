@@ -1,6 +1,20 @@
 package collector
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"encoding/json"
+	"log"
+
+	"github.com/prometheus/client_golang/prometheus"
+)
+
+const (
+	urnUsers = "/scalaboom/widgets/UsersWidget"
+)
+
+
+type usersCollector struct {
+	xserver
+}
 
 type usersWidget struct {
 	Active  int `json:"active"`
@@ -11,8 +25,6 @@ type usersWidget struct {
 }
 
 var (
-	UsersWidget usersWidget
-	
 	usersActiveDesc = prometheus.NewDesc(
 		"xserver_users_active",
 		"Number of users online.",
@@ -41,24 +53,37 @@ var (
 	)
 )
 
-func (u usersWidget) Collect(ch chan<- prometheus.Metric) {
+func (u usersCollector) Describe(ch chan<- *prometheus.Desc) {
+	prometheus.DescribeByCollect(u, ch)
+}
+
+func (u usersCollector) Collect(ch chan<- prometheus.Metric) {
+	uw := usersWidget{}
+
+    request, err := u.xserver.getJson(urnUsers)
+	if err != nil {
+		log.Fatal(err)
+	}
+    json.Unmarshal(request, &uw)
+
+
 	ch <- prometheus.MustNewConstMetric(
-		usersActiveDesc, prometheus.GaugeValue, float64(u.Active),
+		usersActiveDesc, prometheus.GaugeValue, float64(uw.Active),
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		usersBlockedDesc, prometheus.GaugeValue, float64(u.Blocked),
+		usersBlockedDesc, prometheus.GaugeValue, float64(uw.Blocked),
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		usersEnabledDesc, prometheus.GaugeValue, float64(u.Enabled),
+		usersEnabledDesc, prometheus.GaugeValue, float64(uw.Enabled),
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		usersTotalDesc, prometheus.GaugeValue, float64(u.Users),
+		usersTotalDesc, prometheus.GaugeValue, float64(uw.Users),
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		usersVpnDesc, prometheus.GaugeValue, float64(u.Vpn),
+		usersVpnDesc, prometheus.GaugeValue, float64(uw.Vpn),
 	)
 }

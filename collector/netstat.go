@@ -1,17 +1,27 @@
 package collector
 
 import (
+	"encoding/json"
 	"log"
 	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const (
+	urnIfaces = "/scalaboom/widgets/IfacesWidget"
+	urnNetstatStat = "/scalaboom/widgets/StatWidget"
+)
 
-type netstat struct {
-	IfacesWidget
-	StatWidget
+
+type netstatCollector struct {
+	xserver
 }
+
+// type netstat struct {
+// 	IfacesWidget
+// 	StatWidget
+// }
 
 type IfacesWidget struct {
 	Today `json:"today"`
@@ -44,11 +54,6 @@ type Stat struct {
 }
 
 var (
-	Netstat = netstat{
-		IfacesWidget{},
-		StatWidget{},
-	}
-
 	netstatPingDesc = prometheus.NewDesc(
 		"xserver_netstat_ping",
 		"Ping to ya.ru",
@@ -111,8 +116,30 @@ var (
 	)
 )
 
-func (n netstat) Collect(ch chan<- prometheus.Metric) {
-	ping, err := strconv.ParseFloat(n.Ping, 64)
+func (n netstatCollector) Describe(ch chan<- *prometheus.Desc) {
+	prometheus.DescribeByCollect(n, ch)
+}
+
+
+func (n netstatCollector) Collect(ch chan<- prometheus.Metric) {
+	iw := IfacesWidget{}
+
+    request, err := n.xserver.getJson(urnIfaces)
+	if err != nil {
+		log.Fatal(err)
+	}
+    json.Unmarshal(request, &iw)
+
+	sw := StatWidget{}
+
+    request, err = n.xserver.getJson(urnNetstatStat)
+	if err != nil {
+		log.Fatal(err)
+	}
+    json.Unmarshal(request, &sw)	
+
+
+	ping, err := strconv.ParseFloat(iw.Ping, 64)
 	if err != nil {
         log.Fatal(err)
     }
@@ -122,46 +149,46 @@ func (n netstat) Collect(ch chan<- prometheus.Metric) {
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatVpnConnectionsDesc, prometheus.GaugeValue, float64(n.VpnConnections),
+		netstatVpnConnectionsDesc, prometheus.GaugeValue, float64(iw.VpnConnections),
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatChannelUsageRpDesc, prometheus.GaugeValue, n.Rp,
+		netstatChannelUsageRpDesc, prometheus.GaugeValue, iw.Rp,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatChannelUsageTpDesc, prometheus.GaugeValue, n.Tp,
+		netstatChannelUsageTpDesc, prometheus.GaugeValue, iw.Tp,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatChannelUsageRxDesc, prometheus.GaugeValue, n.Rx,
+		netstatChannelUsageRxDesc, prometheus.GaugeValue, iw.Rx,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatChannelUsageTxDesc, prometheus.GaugeValue, n.Tx,
+		netstatChannelUsageTxDesc, prometheus.GaugeValue, iw.Tx,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatStatRxMonthDesc, prometheus.GaugeValue, n.RxMonth,
+		netstatStatRxMonthDesc, prometheus.GaugeValue, sw.RxMonth,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatStatTxMonthDesc, prometheus.GaugeValue, n.TxMonth,
+		netstatStatTxMonthDesc, prometheus.GaugeValue, sw.TxMonth,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatStatRxWeekDesc, prometheus.GaugeValue, n.RxWeek,
+		netstatStatRxWeekDesc, prometheus.GaugeValue, sw.RxWeek,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatStatTxWeekDesc, prometheus.GaugeValue, n.TxWeek,
+		netstatStatTxWeekDesc, prometheus.GaugeValue, sw.TxWeek,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatStatRxDayDesc, prometheus.GaugeValue, n.RxDay,
+		netstatStatRxDayDesc, prometheus.GaugeValue, sw.RxDay,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		netstatStatTxDayDesc, prometheus.GaugeValue, n.TxDay,
+		netstatStatTxDayDesc, prometheus.GaugeValue, sw.TxDay,
 	)
 }
