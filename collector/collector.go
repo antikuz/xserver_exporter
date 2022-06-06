@@ -3,7 +3,6 @@ package collector
 import (
 	"crypto/tls"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -17,10 +16,6 @@ type xserver struct {
 	login  string
 	passwd string
 	insecureSkip bool
-}
-
-type Envelope struct {
-	Oid string `json:"oid"`
 }
 
 func (xserver xserver) getJson(urn string) ([]byte, error) {
