@@ -9,13 +9,12 @@ import (
 )
 
 const (
-	urnIfaces = "/scalaboom/widgets/IfacesWidget"
+	urnIfaces      = "/scalaboom/widgets/IfacesWidget"
 	urnNetstatStat = "/scalaboom/widgets/StatWidget"
 )
 
-
 type netstatCollector struct {
-	xserver
+	*xserver
 }
 
 // type netstat struct {
@@ -120,29 +119,27 @@ func (n netstatCollector) Describe(ch chan<- *prometheus.Desc) {
 	prometheus.DescribeByCollect(n, ch)
 }
 
-
 func (n netstatCollector) Collect(ch chan<- prometheus.Metric) {
 	iw := IfacesWidget{}
 
-    request, err := n.xserver.getJson(urnIfaces)
+	request, err := n.xserver.getJSON(urnIfaces)
 	if err != nil {
 		log.Fatal(err)
 	}
-    json.Unmarshal(request, &iw)
+	json.Unmarshal(request, &iw)
 
 	sw := StatWidget{}
 
-    request, err = n.xserver.getJson(urnNetstatStat)
+	request, err = n.xserver.getJSON(urnNetstatStat)
 	if err != nil {
 		log.Fatal(err)
 	}
-    json.Unmarshal(request, &sw)	
-
+	json.Unmarshal(request, &sw)
 
 	ping, err := strconv.ParseFloat(iw.Ping, 64)
 	if err != nil {
-        log.Fatal(err)
-    }
+		log.Fatal(err)
+	}
 
 	ch <- prometheus.MustNewConstMetric(
 		netstatPingDesc, prometheus.GaugeValue, ping,

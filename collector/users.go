@@ -11,9 +11,8 @@ const (
 	urnUsers = "/scalaboom/widgets/UsersWidget"
 )
 
-
 type usersCollector struct {
-	xserver
+	*xserver
 }
 
 type usersWidget struct {
@@ -60,12 +59,11 @@ func (u usersCollector) Describe(ch chan<- *prometheus.Desc) {
 func (u usersCollector) Collect(ch chan<- prometheus.Metric) {
 	uw := usersWidget{}
 
-    request, err := u.xserver.getJson(urnUsers)
+	request, err := u.xserver.getJSON(urnUsers)
 	if err != nil {
 		log.Fatal(err)
 	}
-    json.Unmarshal(request, &uw)
-
+	json.Unmarshal(request, &uw)
 
 	ch <- prometheus.MustNewConstMetric(
 		usersActiveDesc, prometheus.GaugeValue, float64(uw.Active),

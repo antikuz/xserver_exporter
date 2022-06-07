@@ -11,9 +11,8 @@ const (
 	urnMonitoring = "/scalaboom/widgets/MonitoringWidget"
 )
 
-
 type monitoringCollector struct {
-	xserver
+	*xserver
 }
 
 type monitoringStatistics struct {
@@ -59,11 +58,11 @@ func (m monitoringCollector) Describe(ch chan<- *prometheus.Desc) {
 func (m monitoringCollector) Collect(ch chan<- prometheus.Metric) {
 	ms := monitoringStatistics{}
 
-    request, err := m.xserver.getJson(urnMonitoring)
+	request, err := m.xserver.getJSON(urnMonitoring)
 	if err != nil {
 		log.Fatal(err)
 	}
-    json.Unmarshal(request, &ms)
+	json.Unmarshal(request, &ms)
 
 	ch <- prometheus.MustNewConstMetric(
 		monitoringCpuDesc, prometheus.GaugeValue, ms.Cpu,
