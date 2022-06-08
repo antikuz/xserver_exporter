@@ -104,8 +104,10 @@ func NewXserverManager(url string, login string, passwd string, insecureSkip boo
 	xmc := &monitoringCollector{x}
 	xuc := &usersCollector{x}
 	xnc := &netstatCollector{x}
-	
+	xdc := &harddisksCollector{x}
+
 	prometheus.WrapRegistererWith(prometheus.Labels{"url": url}, reg).MustRegister(xmc)
 	prometheus.WrapRegistererWith(prometheus.Labels{"url": url}, reg).MustRegister(xuc)
 	prometheus.WrapRegistererWith(prometheus.Labels{"url": url}, reg).MustRegister(xnc)
+	prometheus.WrapRegistererWith(prometheus.Labels{"url": url}, reg).MustRegister(xdc)
 }
