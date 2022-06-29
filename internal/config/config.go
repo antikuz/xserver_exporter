@@ -1,6 +1,8 @@
 package config
 
 import (
+	"errors"
+	"os"
 	"sync"
 
 	"github.com/antikuz/xserver_exporter/pkg/logging"
@@ -19,14 +21,25 @@ var once sync.Once
 
 func GetConfig() *Config {
 	once.Do(func() {
+		var err error
+		
 		logger := logging.GetLogger()
 		logger.Info("read exporter configuration")
+		
 		instance = &Config{}
-		if err := cleanenv.ReadConfig("config.yaml", instance); err != nil {
-			help, _ := cleanenv.GetDescription(instance, nil)
+		help, _ := cleanenv.GetDescription(instance, nil)
+		
+		if _, err = os.Stat("config.yaml"); errors.Is(err, os.ErrNotExist) {
+			err = cleanenv.ReadEnv(instance)
+		} else {
+			err = cleanenv.ReadConfig("config.yaml", instance)
+		}
+		
+		if err != nil {
 			logger.Info(help)
 			logger.Fatal(err)
 		}
+
 	})
 	return instance
 }
