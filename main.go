@@ -10,12 +10,19 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	logger := logging.GetLogger()
 	cfg := config.GetConfig()
-
+	
+	logger := logging.GetLogger()
+	loglevel, err := logrus.ParseLevel(cfg.LogLevel)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	logger.Logger.SetLevel(loglevel)
+	
 	registry := prometheus.NewPedanticRegistry()
 	collector.NewXserverManager(
 		logger,

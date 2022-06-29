@@ -14,6 +14,7 @@ type Config struct {
 	Login    string `yaml:"login" env:"LOGIN" env-required:"true"`
 	Passwd   string `yaml:"passwd" env:"PASSWD" env-required:"true"`
 	Insecure bool   `yaml:"insecure" env:"INSECURE" env-required:"true"`
+	LogLevel string `yaml:"logLevel" env:"LOGLEVEL" env-default:"info"`
 }
 
 var instance *Config
@@ -39,7 +40,6 @@ func GetConfig() *Config {
 			logger.Info(help)
 			logger.Fatal(err)
 		}
-
 	})
 	return instance
 }
