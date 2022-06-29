@@ -2,7 +2,6 @@ package collector
 
 import (
 	"encoding/json"
-	"log"
 	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -124,7 +123,7 @@ func (n netstatCollector) Collect(ch chan<- prometheus.Metric) {
 
 	request, err := n.xserver.getJSON(urnIfaces)
 	if err != nil {
-		log.Fatal(err)
+		n.logger.Fatalln(err)
 	}
 	json.Unmarshal(request, &iw)
 
@@ -132,13 +131,13 @@ func (n netstatCollector) Collect(ch chan<- prometheus.Metric) {
 
 	request, err = n.xserver.getJSON(urnNetstatStat)
 	if err != nil {
-		log.Fatal(err)
+		n.logger.Fatalln(err)
 	}
 	json.Unmarshal(request, &sw)
 
 	ping, err := strconv.ParseFloat(iw.Ping, 64)
 	if err != nil {
-		log.Fatal(err)
+		n.logger.Fatalln(err)
 	}
 
 	ch <- prometheus.MustNewConstMetric(

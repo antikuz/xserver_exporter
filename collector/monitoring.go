@@ -2,7 +2,6 @@ package collector
 
 import (
 	"encoding/json"
-	"log"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -60,7 +59,7 @@ func (m monitoringCollector) Collect(ch chan<- prometheus.Metric) {
 
 	request, err := m.xserver.getJSON(urnMonitoring)
 	if err != nil {
-		log.Fatal(err)
+		m.logger.Fatalln(err)
 	}
 	json.Unmarshal(request, &ms)
 

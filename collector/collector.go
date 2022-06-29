@@ -5,10 +5,10 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/cookiejar"
 
+	"github.com/antikuz/xserver_exporter/pkg/logging"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -17,6 +17,7 @@ const (
 )
 
 type xserver struct {
+	logger       *logging.Logger
 	url          string
 	login        string
 	passwd       string
@@ -25,9 +26,10 @@ type xserver struct {
 }
 
 func (xserver xserver) getSession(urn string) *http.Client {
+	xserver.logger.Debugf("Start creating session url:%s\n", xserver.url)
 	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: nil})
 	if err != nil {
-		log.Fatal(err)
+		xserver.logger.Fatalln(err)
 	}
 
 	client := &http.Client{
@@ -42,7 +44,7 @@ func (xserver xserver) getSession(urn string) *http.Client {
 	url := xserver.url + urn
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Fatal(err)
+		xserver.logger.Fatalln(err)
 	}
 
 	auth := base64.StdEncoding.EncodeToString([]byte(
@@ -53,14 +55,14 @@ func (xserver xserver) getSession(urn string) *http.Client {
 	request.Header.Add("authorization", authorizationHeader)
 	res, err := client.Do(request)
 	if err != nil {
-		log.Fatal(err)
+		xserver.logger.Fatalln(err)
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 {
-		log.Fatalf("Error Request: %s\n, status: %d\n", url, res.StatusCode)
+		xserver.logger.Fatalf("Error Request: %s\n, status: %d\n", url, res.StatusCode)
 	}
-
+	xserver.logger.Debugf("Session created cookie:%s", res.Cookies())
 	return client
 }
 
@@ -68,7 +70,7 @@ func (xserver xserver) getJSON(urn string) ([]byte, error) {
 	url := xserver.url + urn
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Fatal(err)
+		xserver.logger.Fatalln(err)
 	}
 
 	auth := base64.StdEncoding.EncodeToString([]byte(
@@ -80,7 +82,7 @@ func (xserver xserver) getJSON(urn string) ([]byte, error) {
 
 	res, err := xserver.client.Do(request)
 	if err != nil {
-		log.Fatal(err)
+		xserver.logger.Fatalf("Failed request to: %s, due to err: %v\n", xserver.url, err)
 	}
 	defer res.Body.Close()
 
@@ -92,15 +94,16 @@ func (xserver xserver) getJSON(urn string) ([]byte, error) {
 	return body, nil
 }
 
-func NewXserverManager(url string, login string, passwd string, insecureSkip bool, reg prometheus.Registerer) {
+func NewXserverManager(logger *logging.Logger, url string, login string, passwd string, insecureSkip bool, reg prometheus.Registerer) {
 	x := &xserver{
+		logger:       logger,
 		url:          url,
 		login:        login,
 		passwd:       passwd,
 		insecureSkip: insecureSkip,
 	}
 	x.client = x.getSession(urnAuth)
-	
+
 	xmc := &monitoringCollector{x}
 	xuc := &usersCollector{x}
 	xnc := &netstatCollector{x}

@@ -61,7 +61,7 @@ func (h harddisksCollector) Collect(ch chan<- prometheus.Metric) {
 
 	request, err := h.xserver.getJSON(urnMainHDD)
 	if err != nil {
-		log.Fatal(err)
+		h.logger.Fatalln(err)
 	}
 	json.Unmarshal(request, &hs)
 
