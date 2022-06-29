@@ -1,9 +1,9 @@
 package config
 
 import (
-	"log"
 	"sync"
 
+	"github.com/antikuz/xserver_exporter/pkg/logging"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -19,12 +19,13 @@ var once sync.Once
 
 func GetConfig() *Config {
 	once.Do(func() {
-		log.Println("read exporter configuration")
+		logger := logging.GetLogger()
+		logger.Info("read exporter configuration")
 		instance = &Config{}
 		if err := cleanenv.ReadConfig("config.yaml", instance); err != nil {
 			help, _ := cleanenv.GetDescription(instance, nil)
-			log.Println(help)
-			log.Fatal(err)
+			logger.Info(help)
+			logger.Fatal(err)
 		}
 	})
 	return instance
