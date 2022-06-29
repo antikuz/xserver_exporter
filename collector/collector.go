@@ -21,7 +21,7 @@ type xserver struct {
 	url          string
 	login        string
 	passwd       string
-	insecureSkip bool
+	insecure bool
 	client       *http.Client
 }
 
@@ -36,7 +36,7 @@ func (xserver xserver) getSession(urn string) *http.Client {
 		Jar: jar,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: xserver.insecureSkip,
+				InsecureSkipVerify: xserver.insecure,
 			},
 		},
 	}
@@ -94,13 +94,13 @@ func (xserver xserver) getJSON(urn string) ([]byte, error) {
 	return body, nil
 }
 
-func NewXserverManager(logger *logging.Logger, url string, login string, passwd string, insecureSkip bool, reg prometheus.Registerer) {
+func NewXserverManager(logger *logging.Logger, url string, login string, passwd string, insecure bool, reg prometheus.Registerer) {
 	x := &xserver{
 		logger:       logger,
 		url:          url,
 		login:        login,
 		passwd:       passwd,
-		insecureSkip: insecureSkip,
+		insecure: insecure,
 	}
 	x.client = x.getSession(urnAuth)
 

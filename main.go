@@ -22,7 +22,7 @@ func main() {
 		cfg.Url,
 		cfg.Login,
 		cfg.Passwd,
-		cfg.InsecureSkip,
+		cfg.Insecure,
 		registry,
 	)
 
