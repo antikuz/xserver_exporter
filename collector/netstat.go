@@ -120,8 +120,12 @@ func (n netstatCollector) Collect(ch chan<- prometheus.Metric) {
 	if err != nil {
 		n.logger.Fatalln(err)
 	}
-	json.Unmarshal(request, &iw)
 
+	err = json.Unmarshal(request, &iw)
+	if err != nil {
+		n.logger.Errorf("NetstatCollect failed unmarshal JSON due to err: %v", err)
+	}
+	
 	sw := StatWidget{}
 
 	request, err = n.xserver.getJSON(urnNetstatStat)
