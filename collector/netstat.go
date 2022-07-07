@@ -123,9 +123,9 @@ func (n netstatCollector) Collect(ch chan<- prometheus.Metric) {
 
 	err = json.Unmarshal(request, &iw)
 	if err != nil {
-		n.logger.Errorf("NetstatCollect failed unmarshal JSON due to err: %v", err)
+		n.logger.Errorf("Failed unmarshal JSON due to err: %v", err)
 	}
-	
+
 	sw := StatWidget{}
 
 	request, err = n.xserver.getJSON(urnNetstatStat)
@@ -135,7 +135,7 @@ func (n netstatCollector) Collect(ch chan<- prometheus.Metric) {
 
 	err = json.Unmarshal(request, &sw)
 	if err != nil {
-		n.logger.Errorf("NetstatCollect failed unmarshal JSON due to err: %v", err)
+		n.logger.Errorf("Failed unmarshal JSON due to err: %v", err)
 	}
 
 	ping, err := strconv.ParseFloat(iw.Ping, 64)

@@ -65,7 +65,7 @@ func (u usersCollector) Collect(ch chan<- prometheus.Metric) {
 
 	err = json.Unmarshal(request, &uw)
 	if err != nil {
-		u.logger.Errorf("UsersCollect failed unmarshal JSON due to err: %v", err)
+		u.logger.Errorf("Failed unmarshal JSON due to err: %v", err)
 	}
 
 	ch <- prometheus.MustNewConstMetric(
