@@ -63,7 +63,10 @@ func (h harddisksCollector) Collect(ch chan<- prometheus.Metric) {
 	if err != nil {
 		h.logger.Fatalln(err)
 	}
-	json.Unmarshal(request, &hs)
+	err = json.Unmarshal(request, &hs)
+	if err != nil {
+		h.logger.Errorf("HardDiskCollect failed unmarshal JSON due to err: %v", err)
+	}
 
 	ch <- prometheus.MustNewConstMetric(
 		harddisksUsedDesc, prometheus.GaugeValue, diskSizeToFloat(hs.Used), hs.Name,

@@ -61,7 +61,11 @@ func (m monitoringCollector) Collect(ch chan<- prometheus.Metric) {
 	if err != nil {
 		m.logger.Fatalln(err)
 	}
-	json.Unmarshal(request, &ms)
+
+	err = json.Unmarshal(request, &ms)
+	if err != nil {
+		m.logger.Errorf("MonitoringCollect failed unmarshal JSON due to err: %v", err)
+	}
 
 	ch <- prometheus.MustNewConstMetric(
 		monitoringCpuDesc, prometheus.GaugeValue, ms.Cpu,

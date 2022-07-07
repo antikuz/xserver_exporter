@@ -16,11 +16,6 @@ type netstatCollector struct {
 	*xserver
 }
 
-// type netstat struct {
-// 	IfacesWidget
-// 	StatWidget
-// }
-
 type IfacesWidget struct {
 	Today `json:"today"`
 }
@@ -133,7 +128,11 @@ func (n netstatCollector) Collect(ch chan<- prometheus.Metric) {
 	if err != nil {
 		n.logger.Fatalln(err)
 	}
-	json.Unmarshal(request, &sw)
+
+	err = json.Unmarshal(request, &sw)
+	if err != nil {
+		n.logger.Errorf("NetstatCollect failed unmarshal JSON due to err: %v", err)
+	}
 
 	ping, err := strconv.ParseFloat(iw.Ping, 64)
 	if err != nil {
