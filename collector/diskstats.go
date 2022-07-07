@@ -18,10 +18,10 @@ type harddisksCollector struct {
 }
 
 type harddisksStatistics struct {
-	Name   string `json:"name"`
-	Used   string `json:"used"`
-	Avail  string `json:"avail"`
-	Size   string `json:"size"`
+	Name  string `json:"name"`
+	Used  string `json:"used"`
+	Avail string `json:"avail"`
+	Size  string `json:"size"`
 }
 
 var (

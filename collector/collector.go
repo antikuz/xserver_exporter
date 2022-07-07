@@ -17,12 +17,12 @@ const (
 )
 
 type xserver struct {
-	logger       *logging.Logger
-	url          string
-	login        string
-	passwd       string
+	logger   *logging.Logger
+	url      string
+	login    string
+	passwd   string
 	insecure bool
-	client       *http.Client
+	client   *http.Client
 }
 
 func (xserver xserver) getSession(urn string) *http.Client {
@@ -96,10 +96,10 @@ func (xserver xserver) getJSON(urn string) ([]byte, error) {
 
 func NewXserverManager(logger *logging.Logger, url string, login string, passwd string, insecure bool, reg prometheus.Registerer) {
 	x := &xserver{
-		logger:       logger,
-		url:          url,
-		login:        login,
-		passwd:       passwd,
+		logger:   logger,
+		url:      url,
+		login:    login,
+		passwd:   passwd,
 		insecure: insecure,
 	}
 	x.client = x.getSession(urnAuth)
