@@ -13,7 +13,7 @@ type Config struct {
 	Url      string `yaml:"url" env:"URL" env-required:"true"`
 	Login    string `yaml:"login" env:"LOGIN" env-required:"true"`
 	Passwd   string `yaml:"passwd" env:"PASSWD" env-required:"true"`
-	Insecure bool   `yaml:"insecure" env:"INSECURE" env-required:"true"`
+	Insecure bool   `yaml:"insecure" env:"INSECURE" env-default:"false"`
 	LogLevel string `yaml:"logLevel" env:"LOGLEVEL" env-default:"info"`
 }
 
