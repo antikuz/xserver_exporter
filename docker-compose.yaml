@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  xserver-exporter:
+    image: xserver-exporter
+    environment:
+      URL: https://127.0.0.1:81
+      LOGIN: root
+      PASSWD: password
+      INSECURE: "true"
+    ports:
+      - 8080:8080
