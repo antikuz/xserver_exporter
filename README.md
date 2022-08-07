@@ -1,8 +1,24 @@
 # Xserver exporter
 Prometheus exporter for xserver.a-real firewall. It collects Xserver statistics and exports them via HTTP for use by Prometheus.
 
-# Installation
+# Usage
+## Binary release
+You can download the latest release on the [release page](https://github.com/antikuz/xserver_exporter/releases).
+Docker images are push to [docker hub](https://hub.docker.com/r/antikuz/xserver-exporter)
 
+# Build
+
+### Build Binary
+```shell
+go build
+```
+
+### Build Docker Image
+```shell
+docker build . -t xserver-exporter
+```
+
+### 
 
 # Configuration
 The image is setup to take parameters from environment variables or config.yaml:
