@@ -1,45 +1,52 @@
 package config
 
 import (
-	"errors"
-	"os"
+	"log"
 	"sync"
 
 	"github.com/antikuz/xserver_exporter/pkg/logging"
-	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Url      string `yaml:"url" env:"URL" env-required:"true"`
-	Login    string `yaml:"login" env:"LOGIN" env-required:"true"`
-	Passwd   string `yaml:"passwd" env:"PASSWD" env-required:"true"`
-	Insecure bool   `yaml:"insecure" env:"INSECURE" env-default:"false"`
-	LogLevel string `yaml:"logLevel" env:"LOGLEVEL" env-default:"info"`
+	Url      string
+	Login    string
+	Passwd   string
+	Insecure bool
+	LogLevel string
 }
 
 var instance *Config
 var once sync.Once
 
 func GetConfig() *Config {
-	once.Do(func() {
-		var err error
+	logger := logging.GetLogger()
+	logger.Info("read exporter configuration")
 
-		logger := logging.GetLogger()
-		logger.Info("read exporter configuration")
+	viper.BindEnv("url")
+	viper.BindEnv("login")
+	viper.BindEnv("passwd")
+	viper.BindEnv("insecure")
+	viper.BindEnv("loglevel")
 
-		instance = &Config{}
-		help, _ := cleanenv.GetDescription(instance, nil)
+	viper.SetDefault("loglevel", "Info")
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
 
-		if _, err = os.Stat("config.yaml"); errors.Is(err, os.ErrNotExist) {
-			err = cleanenv.ReadEnv(instance)
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			logger.Warn("No Config file found, loaded config from Environment - Default path ./config.yaml")
 		} else {
-			err = cleanenv.ReadConfig("config.yaml", instance)
+			logger.Fatalf("fatal error config file: %v", err)
 		}
+	}
 
-		if err != nil {
-			logger.Info(help)
-			logger.Fatal(err)
-		}
-	})
+	instance = &Config{}
+	err := viper.Unmarshal(instance)
+	if err != nil {
+		log.Fatalf("unable to decode config into struct, %v", err)
+	}
+
 	return instance
 }
