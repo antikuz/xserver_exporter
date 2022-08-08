@@ -2,9 +2,22 @@
 Prometheus exporter for xserver.a-real firewall. It collects Xserver statistics and exports them via HTTP for use by Prometheus.
 
 # Usage
-## Binary release
+
+### Binary release
 You can download the latest release on the [release page](https://github.com/antikuz/xserver_exporter/releases).
-Docker images are push to [docker hub](https://hub.docker.com/r/antikuz/xserver-exporter)
+
+## Docker container
+Docker images are push to [docker hub](https://hub.docker.com/r/antikuz/xserver-exporter).
+
+### Installing as Windows Service
+
+1. Download binary
+2. Install [nssm](https://nssm.cc/)
+
+| Action  | Command                                                         |
+| ------- | --------------------------------------------------------------- |
+| install | nssm install xserver_exporter C:\xserver_exporter.exe           |
+| remove  | nssm remove xserver_exporter confirm                            |
 
 # Build
 
