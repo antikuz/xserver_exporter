@@ -1,10 +1,13 @@
 package config
 
 import (
+	"fmt"
 	"log"
+	"os"
 	"sync"
 
 	"github.com/antikuz/xserver_exporter/pkg/logging"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -23,16 +26,21 @@ func GetConfig() *Config {
 	logger := logging.GetLogger()
 	logger.Info("read exporter configuration")
 
-	viper.BindEnv("url")
-	viper.BindEnv("login")
-	viper.BindEnv("passwd")
-	viper.BindEnv("insecure")
-	viper.BindEnv("loglevel")
+	viper.BindEnv("URL")
+	viper.BindEnv("LOGIN")
+	viper.BindEnv("PASSWD")
+	viper.BindEnv("INSECURE")
+	viper.BindEnv("LOGLEVEL")
 
 	viper.SetDefault("loglevel", "Info")
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
+
+	if viper.GetString("config-file") != "" {
+		viper.SetConfigFile(viper.GetString("config-file"))
+	} else {
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
+		viper.AddConfigPath(".")
+	}
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -47,6 +55,7 @@ func GetConfig() *Config {
 	if err != nil {
 		log.Fatalf("unable to decode config into struct, %v", err)
 	}
-
+	log.Printf("%+v", instance)
 	return instance
 }
+
