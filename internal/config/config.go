@@ -1,77 +1,67 @@
 package config
 
 import (
-	"log"
-	"os"
-	"sync"
+    "os"
 
-	"github.com/antikuz/xserver_exporter/pkg/logging"
-	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
+    "github.com/antikuz/xserver_exporter/pkg/logging"
+    "github.com/spf13/pflag"
+    "github.com/spf13/viper"
 )
 
 type Config struct {
-	Url      string
-	Login    string
-	Passwd   string
-	Insecure bool
-	LogLevel string
+    Url      string
+    Login    string
+    Passwd   string
+    Insecure bool
+    LogLevel string `mapstructure:"log-level"`
 }
 
 var instance *Config
-var once sync.Once
 
 func GetConfig() *Config {
-	logger := logging.GetLogger()
-	logger.Info("read exporter configuration")
+    logger := logging.GetLogger()
+    pflag.StringP("url", "u","", "Xserver configuration file path.")
+    pflag.StringP("login", "l","", "User account to authenticate.")
+    pflag.StringP("passwd", "p","", "User account password.")
+    pflag.BoolP("insecure", "i", false, "Allow insecure server connections when using SSL")
+    pflag.String("log-level", "info", "the maximum level of messages that should be logged. (possible values: debug, info, warn, error)")
+    pflag.StringP("config-file", "c","", "xserver configuration file path.")
+    pflag.BoolP("help", "h", false, "Show help.")
+    pflag.CommandLine.SortFlags = false
+    pflag.Parse()
+    
+    help, err := pflag.CommandLine.GetBool("help")
+    if err != nil {
+        logger.Fatalf("Failed to parse help flag, due to err: %v", err)
+    }
 
-	viper.BindEnv("URL")
-	viper.BindEnv("LOGIN")
-	viper.BindEnv("PASSWD")
-	viper.BindEnv("INSECURE")
-	viper.BindEnv("LOGLEVEL")
+    if help {
+        pflag.Usage()
+        os.Exit(0)
+    }
 
-	viper.SetDefault("loglevel", "Info")
+    viper.BindPFlags(pflag.CommandLine)
+    viper.BindEnv("URL")
+    viper.BindEnv("LOGIN")
+    viper.BindEnv("PASSWD")
+    viper.BindEnv("INSECURE")
+    viper.BindEnv("LOGLEVEL")
 
-	if viper.GetString("config-file") != "" {
-		viper.SetConfigFile(viper.GetString("config-file"))
-	} else {
-		viper.SetConfigName("config")
-		viper.SetConfigType("yaml")
-		viper.AddConfigPath(".")
-	}
 
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			logger.Warn("No Config file found, loaded config from Environment - Default path ./config.yaml")
-		} else {
-			logger.Fatalf("fatal error config file: %v", err)
-		}
-	}
+    logger.Info("read exporter configuration")
+    if viper.GetString("config-file") != "" {
+        viper.SetConfigFile(viper.GetString("config-file"))
+        if err := viper.ReadInConfig(); err != nil {
+            logger.Fatalf("fatal error config file: %v", err)
+        }
+    }
 
-	instance = &Config{}
-	err := viper.Unmarshal(instance)
-	if err != nil {
-		logger.Fatalf("unable to decode config into struct, %v", err)
-	}
-	logger.Printf("%+v", instance)
-	return instance
-}
-
-func init() {
-	pflag.String("config-file", "", "set path to config file")
-	pflag.String("login", "", "login")
-	pflag.BoolP("help", "h", false, "shows Task usage")
-	pflag.Parse()
-	help, err := pflag.CommandLine.GetBool("help")
-	if err != nil {
-		log.Fatalf("Failed to parse help flag, due to err: %v", err)
-	}
-
-	if help {
-		pflag.Usage()
-		os.Exit(0)
-	}
-
-	viper.BindPFlags(pflag.CommandLine)
+    instance = &Config{}
+    err = viper.Unmarshal(instance)
+    if err != nil {
+        logger.Fatalf("unable to decode config into struct, %v", err)
+    }
+    
+    logger.Printf("%+v", instance)
+    return instance
 }
