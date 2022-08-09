@@ -79,6 +79,5 @@ func GetConfig() *Config {
         logger.Fatalf("unable to decode config into struct, %v", err)
     }
     
-    logger.Printf("%+v", instance)
     return instance
 }
