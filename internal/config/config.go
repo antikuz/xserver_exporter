@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"sync"
@@ -53,9 +52,26 @@ func GetConfig() *Config {
 	instance = &Config{}
 	err := viper.Unmarshal(instance)
 	if err != nil {
-		log.Fatalf("unable to decode config into struct, %v", err)
+		logger.Fatalf("unable to decode config into struct, %v", err)
 	}
-	log.Printf("%+v", instance)
+	logger.Printf("%+v", instance)
 	return instance
 }
 
+func init() {
+	pflag.String("config-file", "", "set path to config file")
+	pflag.String("login", "", "login")
+	pflag.BoolP("help", "h", false, "shows Task usage")
+	pflag.Parse()
+	help, err := pflag.CommandLine.GetBool("help")
+	if err != nil {
+		log.Fatalf("Failed to parse help flag, due to err: %v", err)
+	}
+
+	if help {
+		pflag.Usage()
+		os.Exit(0)
+	}
+
+	viper.BindPFlags(pflag.CommandLine)
+}
