@@ -40,13 +40,30 @@ func GetConfig() *Config {
         os.Exit(0)
     }
 
-    viper.BindPFlags(pflag.CommandLine)
-    viper.BindEnv("URL")
-    viper.BindEnv("LOGIN")
-    viper.BindEnv("PASSWD")
-    viper.BindEnv("INSECURE")
-    viper.BindEnv("LOGLEVEL")
-
+    err = viper.BindPFlags(pflag.CommandLine)
+    if err != nil {
+        logger.Fatalf("Failed to viper.BindPFlags, due to err: %v", err)
+    }
+    err = viper.BindEnv("URL")
+    if err != nil {
+        logger.Fatalf("Failed to viper.BindEnv, due to err: %v", err)
+    }
+    err = viper.BindEnv("LOGIN")
+    if err != nil {
+        logger.Fatalf("Failed to viper.BindEnv, due to err: %v", err)
+    }
+    err = viper.BindEnv("PASSWD")
+    if err != nil {
+        logger.Fatalf("Failed to viper.BindEnv, due to err: %v", err)
+    }
+    err = viper.BindEnv("INSECURE")
+    if err != nil {
+        logger.Fatalf("Failed to viper.BindEnv, due to err: %v", err)
+    }
+    err = viper.BindEnv("LOGLEVEL")
+    if err != nil {
+        logger.Fatalf("Failed to viper.BindEnv, due to err: %v", err)
+    }
 
     logger.Info("read exporter configuration")
     if viper.GetString("config-file") != "" {
