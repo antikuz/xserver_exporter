@@ -16,7 +16,7 @@ Docker images are push to [docker hub](https://hub.docker.com/r/antikuz/xserver-
 
 | Action  | Command                                                         |
 | ------- | --------------------------------------------------------------- |
-| install | nssm install xserver_exporter C:\xserver_exporter.exe           |
+| install | nssm install xserver_exporter C:\xserver_exporter.exe \[args\]  |
 | remove  | nssm remove xserver_exporter confirm                            |
 
 # Build
@@ -34,21 +34,31 @@ docker build . -t xserver-exporter
 ### 
 
 # Configuration
-The image is setup to take parameters from environment variables or config.yaml:
+The image is setup to take parameters from command flags, environment variables or config file:
+
+Accept flags:
+```bash
+-u, --url string           Xserver configuration file path.
+-l, --login string         User account to authenticate.
+-p, --passwd string        User account password.
+-i, --insecure             Allow insecure server connections when using SSL
+    --log-level string     the maximum level of messages that should be logged. (possible values: debug, info, warn, error) (default "info")
+-c, --config-file string   xserver configuration file path.
+-h, --help                 Show help.
+```
 
 The available environment variables are:
-
 * `URL` Xserver address, example https://127.0.0.1:81
 * `LOGIN` User to access xserver
 * `PASSWD` Password to access xserver
-* `INSECURE` Ignore server certificate verification, defaul false
+* `INSECURE` Ignore server certificate verification, default false
 * `LOGLEVEL` Sets the logging level, default info
 
-When using a configuration file `config.yaml`:
+When using a configuration file:
 * `url` Xserver address, example https://127.0.0.1:81
 * `login` User to access xserver
 * `passwd` Password to access xserver
-* `insecure` Ignore server certificate verification, defaul false
+* `insecure` Ignore server certificate verification, default false
 * `logLevel` Sets the logging level, default info
 
 # Dashboard
