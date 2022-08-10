@@ -6,7 +6,7 @@ Prometheus exporter for xserver.a-real firewall. It collects Xserver statistics 
 ### Binary release
 You can download the latest release on the [release page](https://github.com/antikuz/xserver_exporter/releases).
 
-## Docker container
+### Docker container
 Docker images are push to [docker hub](https://hub.docker.com/r/antikuz/xserver-exporter).
 
 ### Installing as Windows Service
